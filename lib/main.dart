@@ -34,3 +34,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+/*
+١- ال news details و ده انكم هتفتحو bottom sheet فيه ال details بتاعت ال article لما تعمل click علي article معين
+
+ */

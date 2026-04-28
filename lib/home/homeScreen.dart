@@ -31,7 +31,7 @@ class _HomescreenState extends State<Homescreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const SearchScreen()),
+                MaterialPageRoute(builder: (_) =>  SearchScreen()),
               );
             },
           ),

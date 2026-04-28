@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:news/api/api_manager.dart';
+import 'package:news/home/news/news_details_bottom_sheet.dart';
 import 'package:news/home/news/news_item.dart';
 import 'package:news/home/widget/main_error_widget.dart';
 import 'package:news/home/widget/main_loading_widget.dart';
@@ -63,11 +64,21 @@ class _NewsWidgetState extends State<NewsWidget> {
                   return SizedBox(height: height * 0.02);
                 },
                 itemBuilder: (context, index) {
-                  return NewsItem(news: newsList[index]);
+                  return InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) =>
+                              NewsDetailsBottomSheet(news: newsList[index]),
+                        );
+                      },
+                      child: NewsItem(news: newsList[index]));
                 },
                 itemCount: newsList.length,
               );
       },
     );
   }
+
+
 }

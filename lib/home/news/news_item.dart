@@ -9,11 +9,10 @@ class NewsItem extends StatelessWidget {
   final News news;
   final VoidCallback? onTap;
 
-  const NewsItem({super.key, required this.news, this.onTap});
+   NewsItem({super.key, required this.news, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    // FIX: was using .minute instead of the full date — now using difference correctly
     DateTime? postDate;
     try {
       postDate = DateTime.parse(news.publishedAt ?? '').toLocal();
@@ -48,7 +47,7 @@ class NewsItem extends StatelessWidget {
                   imageUrl: news.urlToImage!,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => const MainLoadingWidget(),
+                  placeholder: (context, url) =>  MainLoadingWidget(),
                   errorWidget: (context, url, error) => Container(
                     height: 180,
                     color: Theme.of(context).splashColor.withOpacity(0.1),
@@ -76,7 +75,7 @@ class NewsItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
+                 SizedBox(width: 8),
                 Text(
                   timeResult,
                   style: Theme.of(context).textTheme.labelSmall,
