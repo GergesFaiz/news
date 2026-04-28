@@ -7,55 +7,84 @@ import 'package:timeago/timeago.dart' as timeago;
 
 class NewsItem extends StatelessWidget {
   final News news;
-  late var postDate = DateTime.now().subtract(Duration(minutes:DateTime.parse(news.publishedAt ?? '').minute));
+  final VoidCallback? onTap;
 
-
-   NewsItem({super.key, required this.news});
+  const NewsItem({super.key, required this.news, this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    // FIX: was using .minute instead of the full date — now using difference correctly
+    DateTime? postDate;
+    try {
+      postDate = DateTime.parse(news.publishedAt ?? '').toLocal();
+    } catch (_) {
+      postDate = DateTime.now();
+    }
+    String timeResult = timeago.format(postDate);
 
-    String result = timeago.format(postDate, locale: 'ar');
     var width = context.width;
     var height = context.height;
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: width * 0.02 ),
-      padding: EdgeInsets.symmetric(horizontal: width * 0.02 ,vertical: height*0.02),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).splashColor, width: 2),
-      ),
 
-      child: Column(
-        spacing: height * 0.02,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: CachedNetworkImage(
-              imageUrl: news.urlToImage ?? '',
-              placeholder: (context, url) => MainLoadingWidget(),
-              errorWidget: (context, url, error) => Icon(Icons.error,color: Theme.of(context).canvasColor,),
-            ),
-          ),
-          Text(
-              news.title ?? '', style: Theme.of(context).textTheme.labelLarge),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  'By:${news.author ?? ''}',
-                  style: Theme.of(context).textTheme.labelSmall,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: width * 0.02),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.02,
+          vertical: height * 0.02,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Theme.of(context).splashColor, width: 1.5),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (news.urlToImage != null && news.urlToImage!.isNotEmpty)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: CachedNetworkImage(
+                  imageUrl: news.urlToImage!,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const MainLoadingWidget(),
+                  errorWidget: (context, url, error) => Container(
+                    height: 180,
+                    color: Theme.of(context).splashColor.withOpacity(0.1),
+                    child: Icon(
+                      Icons.image_not_supported_outlined,
+                      color: Theme.of(context).splashColor.withOpacity(0.4),
+                      size: 40,
+                    ),
+                  ),
                 ),
               ),
-
-              Text(result,
-                // news.publishedAt ?? '',
-                style: Theme.of(context).textTheme.labelSmall,
-              ),
-            ],
-          ),
-        ],
+            SizedBox(height: height * 0.015),
+            Text(
+              news.title ?? '',
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            SizedBox(height: height * 0.01),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    'By: ${news.author ?? 'Unknown'}',
+                    style: Theme.of(context).textTheme.labelSmall,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  timeResult,
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

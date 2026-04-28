@@ -1,12 +1,15 @@
+
 import 'package:flutter/material.dart';
 import 'package:news/api/api_manager.dart';
 import 'package:news/home/category_details/sources/source_widget.dart';
 import 'package:news/home/widget/main_error_widget.dart';
 import 'package:news/home/widget/main_loading_widget.dart';
+import 'package:news/model/Category.dart';
 import 'package:news/model/source_response.dart';
 
 class CategoryDetails extends StatefulWidget {
-  const CategoryDetails({super.key});
+  final Category category;
+   CategoryDetails({super.key,required this.category});
 
   @override
   State<CategoryDetails> createState() => _CategoryDetailsState();
@@ -16,7 +19,7 @@ class _CategoryDetailsState extends State<CategoryDetails> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<SourceResponse>(
-      future: ApiManager.getSources(),
+      future: ApiManager.getSources(widget.category.id),
       builder: (context, snapshot) {
         //todo:loading
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -26,7 +29,7 @@ class _CategoryDetailsState extends State<CategoryDetails> {
           //todo: Error
           return MainErrorWidget(
             onPressed: () {
-              ApiManager.getSources();
+              ApiManager.getSources(widget.category.id);
               setState(() {});
             },
             massage: 'Something went wrong',
@@ -37,7 +40,7 @@ class _CategoryDetailsState extends State<CategoryDetails> {
           //todo:response= Error
           return MainErrorWidget(
             onPressed: () {
-              ApiManager.getSources();
+              ApiManager.getSources(widget.category.id);
               setState(() {});
             },
             massage: snapshot.data!.message!,

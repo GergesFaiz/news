@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:news/model/category_model.dart';
+import 'package:news/model/Category.dart';
 import 'package:news/utils/app_colors.dart';
 import 'package:news/utils/screen_utils.dart';
 

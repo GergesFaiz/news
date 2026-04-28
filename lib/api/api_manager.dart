@@ -7,43 +7,45 @@ import 'package:news/model/news_response.dart';
 import 'package:news/model/source_response.dart';
 
 class ApiManager {
-  /*
-   https://newsapi.org/v2/top-headlines/sources?apiKey=500c5a4f9b244f3db92a47f436f1819e
-  * */
-  static Future<SourceResponse> getSources() async {
+  static Future<SourceResponse> getSources(String categoryId) async {
     try {
       Uri url = Uri.https(ApiConstants.baseUrl, EndPoints.sourceApi, {
         'apiKey': ApiConstants.apiKey,
+        'category': categoryId,
       });
       var response = await http.get(url);
-
-      // SourceResponse.fromJson(jsonDecode(response.body));
-      var bodyString = response.body; //string
-      //string =>json
-      var json = jsonDecode(bodyString);
-      //json=>object
-      return SourceResponse.fromJson(json);
+      return SourceResponse.fromJson(jsonDecode(response.body));
     } catch (e) {
       rethrow;
     }
   }
 
-  /*
-  GET https://newsapi.org/v2/everything?q=bitcoin&apiKey=b43d7821ea454ae1a019931358757859
-  */
   static Future<NewResponse> getNewsBySourceId(String sourceId) async {
     try {
-      Uri url = Uri.https(ApiConstants.baseUrl, EndPoints.newsApi,
-          {
-        'apiKey':ApiConstants.apiKey,
-        'sources': sourceId
+      Uri url = Uri.https(ApiConstants.baseUrl, EndPoints.newsApi, {
+        'apiKey': ApiConstants.apiKey,
+        'sources': sourceId,
       });
       var response = await http.get(url);
       return NewResponse.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      rethrow;
     }
-    catch(e) {
-    rethrow;
   }
 
+  // NEW: Search endpoint
+  static Future<NewResponse> searchNews(String query) async {
+    try {
+      Uri url = Uri.https(ApiConstants.baseUrl, EndPoints.newsApi, {
+        'apiKey': ApiConstants.apiKey,
+        'q': query,
+        'sortBy': 'publishedAt',
+        'pageSize': '20',
+      });
+      var response = await http.get(url);
+      return NewResponse.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      rethrow;
+    }
   }
 }
