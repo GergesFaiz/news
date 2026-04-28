@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:news/api/api_manager.dart';
+import 'package:news/home/news/news_details_bottom_sheet.dart';
 import 'package:news/home/news/news_item.dart';
 import 'package:news/home/search/empty_search_widget.dart';
 import 'package:news/home/widget/main_error_widget.dart';
@@ -107,8 +108,8 @@ class _SearchScreenState extends State<SearchScreen> {
                             );
                           }
 
-                          final articles = snapshot.data?.articles ?? [];
-                          if (articles.isEmpty) {
+                          final newsList = snapshot.data?.articles ?? [];
+                          if (newsList.isEmpty) {
                             return Center(
                               child: Text(
                                 'No results for "$querySearch"',
@@ -117,11 +118,20 @@ class _SearchScreenState extends State<SearchScreen> {
                             );
                           }
                           return ListView.separated(
-                            itemCount: articles.length,
+                            itemCount: newsList.length,
                             separatorBuilder: (context, index) =>
                                 SizedBox(height: height * 0.02),
-                            itemBuilder: (context, index) =>
-                                NewsItem(news: articles[index]),
+                            itemBuilder: (context, index) {
+                              return InkWell(
+                                  onTap: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) =>
+                                          NewsDetailsBottomSheet(news: newsList[index]),
+                                    );
+                                  },
+                                  child: NewsItem(news: newsList[index]));
+                            }
                           );
                         },
                       ),
