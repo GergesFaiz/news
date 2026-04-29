@@ -1,3 +1,9 @@
+
+
+https://github.com/user-attachments/assets/8d1a8a5d-4351-4749-8d09-8e842572f65a
+
+
+
 # news
 
 SplashScreen
@@ -12,10 +18,9 @@ CategoryDetailsScreen
 
 https://github.com/user-attachments/assets/a94ef969-ae5a-4987-9817-ca7aa6ee4204
 
-SearchScreen
+SearchScreen_part1
 
-
-
+https://github.com/user-attachments/assets/c8bd39eb-52aa-4d36-9cf0-2d91f80b5c70
 
 RadioScreen
 
