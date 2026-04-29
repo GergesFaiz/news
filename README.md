@@ -1,9 +1,3 @@
-
-
-https://github.com/user-attachments/assets/8d1a8a5d-4351-4749-8d09-8e842572f65a
-
-
-
 # news
 
 SplashScreen
