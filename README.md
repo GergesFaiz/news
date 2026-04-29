@@ -2,7 +2,7 @@
 
 SplashScreen
 
-[News_SplashScreen.mp4](../../New%20folder%20%282%29/news/News_SplashScreen.mp4)
+https://github.com/user-attachments/assets/d14efeac-8ad0-47d5-a322-9c4164278c5b
 
 QuranScreen
 
