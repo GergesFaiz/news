@@ -19,3 +19,9 @@ https://github.com/user-attachments/assets/c8bd39eb-52aa-4d36-9cf0-2d91f80b5c70
 SearchScreen_part2
 
 https://github.com/user-attachments/assets/ef45bda6-3d6b-4f67-bf17-d5c0f12f8ccc
+
+Localization
+
+https://github.com/user-attachments/assets/f72e5d27-523d-46a5-a3f9-357afbfd8ace
+
+
