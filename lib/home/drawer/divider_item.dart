@@ -8,7 +8,7 @@ class DividerItem extends StatelessWidget {
   Widget build(BuildContext context) {
     var  width = context.width;
     return Divider(
-      color: AppColors.whiteColor,
+      color: Theme.of(context).splashColor,
       endIndent: width * 0.06,
       indent: width * 0.06,
       thickness: 2,

@@ -17,8 +17,8 @@ class DrawerItem extends StatelessWidget {
       child: Row(
         spacing: width * 0.02,
         children: [
-          Image.asset(iconName),
-          Text(name, style: AppStyles.bold20White),
+          Image.asset(iconName,color: Theme.of(context).splashColor,),
+          Text(name, style: Theme.of(context).textTheme.titleMedium),
         ],
       ),
     );

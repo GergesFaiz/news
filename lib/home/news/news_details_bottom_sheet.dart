@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:news/model/news_response.dart';
-import 'package:news/utils/app_colors.dart';
 import 'package:news/utils/screen_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -18,7 +17,7 @@ class NewsDetailsBottomSheet extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).splashColor,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -36,9 +35,7 @@ class NewsDetailsBottomSheet extends StatelessWidget {
             ),
             Text(
               news.content ?? "",
-              style: Theme.of(
-                context,
-              ).textTheme.labelMedium?.copyWith(color: AppColors.blackColor),
+              style: Theme.of(context).textTheme.displayMedium,
             ),
             ElevatedButton(
               onPressed: () {
@@ -46,7 +43,7 @@ class NewsDetailsBottomSheet extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).primaryColor,
-                foregroundColor: Theme.of(context).splashColor,
+                foregroundColor: Theme.of(context).primaryColor,
 
                 minimumSize: Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
