@@ -1,0 +1,22 @@
+{
+  "language": "Language",
+  "english": "English",
+  "arabic": "Arabic",
+  "theme": "Theme",
+  "dark": "Dark",
+  "light": "Light",
+
+  "news": "News",
+  "newsApp": "News App",
+
+  "goToHome": "Go To Home",
+
+  "business": "Business",
+  "entertainment": "Entertainment",
+  "general": "General",
+  "health": "Health",
+  "science": "Science",
+  "sports": "Sports",
+  "technology": "Technology"
+}
+

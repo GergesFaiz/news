@@ -1,0 +1,27 @@
+{
+  "language": "اللغة",
+  "english": "الانجليزية",
+  "arabic": "العربية",
+  "theme": " النمط",
+  "dark": "ليلي",
+  "light": "نهاري",
+
+  "news": "اخبار",
+  "newsApp": "تطبيق الاخبار",
+
+  "goToHome": "اذهب الي صفحة المنزل",
+
+  "business": "عمل",
+  "entertainment": "ترفيه",
+  "general": "عام",
+  "health": "الصحة",
+  "science": "علم",
+  "sports": "رياضة",
+  "technology": "التكنولوجيا"
+}
+
+
+
+
+
+

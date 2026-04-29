@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:news/l10n/app_localizations.dart';
 import 'package:news/model/Category.dart';
 import 'package:news/utils/app_colors.dart';
 import 'package:news/utils/screen_utils.dart';
@@ -8,6 +9,26 @@ class CategoryItem extends StatelessWidget {
   final int index;
 
   const CategoryItem({super.key, required this.category, required this.index});
+
+  String _getLocalizedTitle(BuildContext context, String id) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (id.toLowerCase()) {
+      case 'sports':
+        return l10n.sports;
+      case 'technology':
+        return l10n.technology;
+      case 'business':
+        return l10n.business;
+      case 'entertainment':
+        return l10n.entertainment;
+      case 'health':
+        return l10n.health;
+      case 'science':
+        return l10n.science;
+      default:
+        return l10n.general;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +48,9 @@ class CategoryItem extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                category.title,
+                _getLocalizedTitle(context, category.id),
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).primaryColor,fontSize: 36
+                  color: Theme.of(context).primaryColor, fontSize: 36,
                 ),
               ),
             ),

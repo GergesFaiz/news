@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:news/home/drawer/divider_item.dart';
 import 'package:news/home/drawer/drawer_item.dart';
+import 'package:news/home/drawer/option_widget.dart';
+import 'package:news/l10n/app_localizations.dart';
 import 'package:news/providers/language_provider.dart';
 import 'package:news/providers/theme_provider.dart';
 import 'package:news/utils/app_assets.dart';
@@ -11,7 +13,7 @@ class HomeDrawer extends StatelessWidget {
   final Function onDrawerClick;
   final VoidCallback? onSearchClick;
 
-  const HomeDrawer({
+  HomeDrawer({
     required this.onDrawerClick,
     this.onSearchClick,
     super.key,
@@ -22,7 +24,7 @@ class HomeDrawer extends StatelessWidget {
     var height = context.height;
     final themeProvider = context.watch<ThemeProvider>();
     final languageProvider = context.watch<LanguageProvider>();
-
+    String language = 'ssssssssssssssss';
     return Drawer(
       backgroundColor: Theme.of(context).primaryColor,
       child: Column(
@@ -32,7 +34,7 @@ class HomeDrawer extends StatelessWidget {
             decoration: BoxDecoration(color: Theme.of(context).splashColor),
             child: Center(
               child: Text(
-                "News App",
+                AppLocalizations.of(context)!.newsApp,
                 style: Theme.of(context).textTheme.labelLarge!.copyWith(
                   color: Theme.of(context).primaryColor,
                   fontSize: 26,
@@ -44,17 +46,20 @@ class HomeDrawer extends StatelessWidget {
           // Go Home
           InkWell(
             onTap: () => onDrawerClick(),
-            child: DrawerItem(iconName: AppAssets.homeIcon, name: 'Go To Home'),
+            child: DrawerItem(iconName: AppAssets.homeIcon,
+                name: AppLocalizations.of(context)!.goToHome),
           ),
           SizedBox(height: height * 0.02),
           DividerItem(),
           SizedBox(height: height * 0.02),
-
           // Theme section
-          DrawerItem(iconName: AppAssets.themeIcon, name: 'Theme'),
+          DrawerItem(iconName: AppAssets.themeIcon,
+              name: AppLocalizations.of(context)!.theme),
           SizedBox(height: height * 0.01),
-          _ToggleOption(
-            label: themeProvider.isDark ? 'Dark' : 'Light',
+          OptionWidget(
+            label: themeProvider.isDark
+                ? AppLocalizations.of(context)!.dark
+                : AppLocalizations.of(context)!.light,
             onPressed: () => themeProvider.toggleTheme(),
           ),
 
@@ -63,11 +68,12 @@ class HomeDrawer extends StatelessWidget {
           SizedBox(height: height * 0.02),
 
           // Language section
-          DrawerItem(iconName: AppAssets.languageIcon, name: 'Language'),
+          DrawerItem(iconName: AppAssets.languageIcon,
+              name: AppLocalizations.of(context)!.language),
           SizedBox(height: height * 0.01),
-          _ToggleOption(
-            label: languageProvider.languageLabel,
-            onPressed: () => languageProvider.toggleLanguage(),
+          OptionWidget(
+            label: languageProvider.isEnglish ? AppLocalizations.of(context)!.english : AppLocalizations.of(context)!.arabic,
+            onPressed: () => languageProvider.changeLanguage(),
           ),
         ],
       ),
@@ -75,42 +81,4 @@ class HomeDrawer extends StatelessWidget {
   }
 }
 
-class _ToggleOption extends StatelessWidget {
-  final String label;
-  final VoidCallback onPressed;
 
-  const _ToggleOption({required this.label, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    var width = context.width;
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: width * 0.04),
-      padding: EdgeInsets.symmetric(horizontal: width * 0.02),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).splashColor, width: 1.5),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: Theme.of(context)
-                .textTheme
-                .headlineLarge!
-                .copyWith(color: Theme.of(context).splashColor),
-          ),
-          IconButton(
-            onPressed: onPressed,
-            icon: Icon(
-              Icons.swap_horiz_rounded,
-              size: 28,
-              color: Theme.of(context).splashColor,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
