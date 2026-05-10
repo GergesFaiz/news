@@ -19,6 +19,23 @@ class ApiManager {
       rethrow;
     }
   }
+  static Future<List<Source>> getSourcesById(String categoryId) async {
+    try {
+      Uri url = Uri.https(ApiConstants.baseUrl, EndPoints.sourceApi, {
+        'apiKey': ApiConstants.apiKey,
+        'category': categoryId,
+      });
+      var response = await http.get(url);
+      final sourceResponse = SourceResponse.fromJson(jsonDecode(response.body));
+
+      if (sourceResponse.status != 'ok') {
+        throw Exception(sourceResponse.message ?? 'Unknown error');
+      }
+      return sourceResponse.sources ?? [];
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   static Future<NewResponse> getNewsBySourceId(String sourceId) async {
     try {
@@ -33,17 +50,22 @@ class ApiManager {
     }
   }
 
-  // NEW: Search endpoint
-  static Future<NewResponse> searchNews(String query) async {
+  static Future<List<News>> searchNews(String query, {int page = 1}) async {
     try {
       Uri url = Uri.https(ApiConstants.baseUrl, EndPoints.newsApi, {
         'apiKey': ApiConstants.apiKey,
         'q': query,
         'sortBy': 'publishedAt',
         'pageSize': '20',
+        'page': '$page',
       });
       var response = await http.get(url);
-      return NewResponse.fromJson(jsonDecode(response.body));
+      final newResponse = NewResponse.fromJson(jsonDecode(response.body));
+
+      if (newResponse.status != 'ok') {
+        throw Exception(newResponse.message ?? 'Unknown error');
+      }
+      return newResponse.articles ?? [];
     } catch (e) {
       rethrow;
     }

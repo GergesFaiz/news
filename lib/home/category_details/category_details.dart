@@ -1,10 +1,12 @@
 
 import 'package:flutter/material.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:news/api/api_manager.dart';
 import 'package:news/home/category_details/sources/source_widget.dart';
 import 'package:news/home/widget/main_error_widget.dart';
 import 'package:news/home/widget/main_loading_widget.dart';
 import 'package:news/model/Category.dart';
+import 'package:news/model/news_response.dart';
 import 'package:news/model/source_response.dart';
 
 class CategoryDetails extends StatefulWidget {
@@ -16,6 +18,7 @@ class CategoryDetails extends StatefulWidget {
 }
 
 class _CategoryDetailsState extends State<CategoryDetails> {
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<SourceResponse>(
