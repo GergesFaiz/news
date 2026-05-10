@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:news/api/api_manager.dart';
+import 'package:news/api/Dio/Dio_manager.dart';
 import 'package:news/home/news/news_details_bottom_sheet.dart';
 import 'package:news/home/news/news_item.dart';
 import 'package:news/home/search/empty_search_widget.dart';
@@ -7,23 +7,47 @@ import 'package:news/home/widget/main_error_widget.dart';
 import 'package:news/home/widget/main_loading_widget.dart';
 import 'package:news/model/news_response.dart';
 import 'package:news/utils/screen_utils.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class SearchScreen extends StatefulWidget {
-  SearchScreen({super.key});
+  const SearchScreen({super.key});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final TextEditingController controller1 = TextEditingController();
-  Future<NewResponse>? searchFuture;
-  String querySearch = '';
+  final TextEditingController _controller = TextEditingController();
+  String _querySearch = '';
+  bool _hasSearched = false;
+
+  late final PagingController<int, News> _pagingController =
+      PagingController<int, News>(
+        getNextPageKey: (state) =>
+            state.lastPageIsEmpty ? null : state.nextIntPageKey,
+        fetchPage: (pageKey) =>
+            DioManager().searchNews(_querySearch, page: pageKey),
+      );
+
+  void _onSearch(String query) {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty || trimmed == _querySearch) return;
+    _querySearch = trimmed;
+    setState(() => _hasSearched = true);
+    _pagingController.refresh();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _pagingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    var height = context.height;
-    var width = context.width;
+    final height = context.height;
+    final width = context.width;
 
     return Scaffold(
       body: SafeArea(
@@ -32,10 +56,11 @@ class _SearchScreenState extends State<SearchScreen> {
           child: Column(
             children: [
               SizedBox(height: height * 0.02),
-              // Search bar
+
+              // Search Bar
               TextField(
-                controller: controller1,
-                onSubmitted: onSearch,
+                controller: _controller,
+                onSubmitted: _onSearch,
                 textInputAction: TextInputAction.search,
                 style: Theme.of(context).textTheme.labelMedium,
                 decoration: InputDecoration(
@@ -45,18 +70,19 @@ class _SearchScreenState extends State<SearchScreen> {
                     Icons.search,
                     color: Theme.of(context).splashColor,
                   ),
-                  suffixIcon: controller1.text.isNotEmpty
+                  suffixIcon: _controller.text.isNotEmpty
                       ? IconButton(
                           icon: Icon(
                             Icons.clear,
                             color: Theme.of(context).splashColor,
                           ),
                           onPressed: () {
-                            controller1.clear();
+                            _controller.clear();
                             setState(() {
-                              searchFuture = null;
-                              querySearch = '';
+                              _querySearch = '';
+                              _hasSearched = false;
                             });
+                            _pagingController.refresh();
                           },
                         )
                       : null,
@@ -74,66 +100,71 @@ class _SearchScreenState extends State<SearchScreen> {
                       width: 2,
                     ),
                   ),
-                  contentPadding: EdgeInsets.symmetric(
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 14,
                   ),
                 ),
-                onChanged: (v) => setState(() {}),
+                onChanged: (_) => setState(() {}),
               ),
+
               SizedBox(height: height * 0.02),
 
               // Results
               Expanded(
-                child: searchFuture == null
+                child: !_hasSearched
                     ? EmptySearchWidget()
-                    : FutureBuilder<NewResponse>(
-                        future: searchFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return MainLoadingWidget();
-                          }
-                          if (snapshot.hasError) {
-                            return MainErrorWidget(
-                              massage: 'Something went wrong',
-                              onPressed: () => onSearch(controller1.text),
-                            );
-                          }
-                          if (snapshot.data?.status != 'ok') {
-                            return MainErrorWidget(
-                              massage:
-                                  snapshot.data?.message ?? 'Unknown error',
-                              onPressed: () => onSearch(controller1.text),
-                            );
-                          }
-
-                          final newsList = snapshot.data?.articles ?? [];
-                          if (newsList.isEmpty) {
-                            return Center(
-                              child: Text(
-                                'No results for "$querySearch"',
-                                style: Theme.of(context).textTheme.labelMedium,
-                              ),
-                            );
-                          }
-                          return ListView.separated(
-                            itemCount: newsList.length,
-                            separatorBuilder: (context, index) =>
-                                SizedBox(height: height * 0.02),
-                            itemBuilder: (context, index) {
-                              return InkWell(
-                                  onTap: () {
-                                    showModalBottomSheet(
+                    : PagingListener(
+                        controller: _pagingController,
+                        builder: (context, state, fetchNextPage) =>
+                            PagedListView<int, News>(
+                              state: state,
+                              fetchNextPage: fetchNextPage,
+                              builderDelegate: PagedChildBuilderDelegate<News>(
+                                itemBuilder: (context, news, index) => Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom: height * 0.02,
+                                  ),
+                                  child: InkWell(
+                                    onTap: () => showModalBottomSheet(
                                       context: context,
-                                      builder: (context) =>
-                                          NewsDetailsBottomSheet(news: newsList[index]),
-                                    );
-                                  },
-                                  child: NewsItem(news: newsList[index]));
-                            }
-                          );
-                        },
+                                      builder: (_) =>
+                                          NewsDetailsBottomSheet(news: news),
+                                    ),
+                                    child: NewsItem(news: news),
+                                  ),
+                                ),
+                                firstPageProgressIndicatorBuilder: (_) =>
+                                    const MainLoadingWidget(),
+                                newPageProgressIndicatorBuilder: (_) =>
+                                    const Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(16),
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    ),
+                                firstPageErrorIndicatorBuilder: (_) =>
+                                    MainErrorWidget(
+                                      massage: 'Something went wrong',
+                                      onPressed: _pagingController.refresh,
+                                    ),
+                                newPageErrorIndicatorBuilder: (_) => Center(
+                                  child: TextButton(
+                                    onPressed: fetchNextPage,
+
+                                    child: const Text('Retry'),
+                                  ),
+                                ),
+                                noItemsFoundIndicatorBuilder: (_) => Center(
+                                  child: Text(
+                                    'No results for "$_querySearch"',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.labelMedium,
+                                  ),
+                                ),
+                              ),
+                            ),
                       ),
               ),
             ],
@@ -141,20 +172,5 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
     );
-  }
-
-  void onSearch(String query) {
-    final trimmed = query.trim();
-    if (trimmed.isEmpty || trimmed == querySearch) return;
-    querySearch = trimmed;
-    setState(() {
-      searchFuture = ApiManager.searchNews(trimmed);
-    });
-  }
-
-  @override
-  void dispose() {
-    controller1.dispose();
-    super.dispose();
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:news/api/api_manager.dart';
+import 'package:news/api/Dio/Dio_manager.dart';
 import 'package:news/home/news/news_details_bottom_sheet.dart';
 import 'package:news/home/news/news_item.dart';
 import 'package:news/home/widget/main_error_widget.dart';
@@ -23,7 +23,7 @@ class _NewsWidgetState extends State<NewsWidget> {
     var width = context.width;
     var height = context.height;
     return FutureBuilder<NewResponse>(
-      future: ApiManager.getNewsBySourceId(widget.source.id ?? ''),
+      future: DioManager().getNewsBySourceId(widget.source.id ?? ''),
       builder: (context, snapshot) {
         //todo:loading
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -32,7 +32,7 @@ class _NewsWidgetState extends State<NewsWidget> {
           //todo: Error
           return MainErrorWidget(
             onPressed: () {
-              ApiManager.getNewsBySourceId(widget.source.id ?? '');
+              DioManager().getNewsBySourceId(widget.source.id ?? '');
               setState(() {});
             },
             massage: 'Something went wrong',
@@ -43,7 +43,7 @@ class _NewsWidgetState extends State<NewsWidget> {
           //todo:response= Error
           return MainErrorWidget(
             onPressed: () {
-              ApiManager.getNewsBySourceId(widget.source.id ?? '');
+              DioManager().getNewsBySourceId(widget.source.id ?? '');
               setState(() {});
             },
             massage: snapshot.data!.message!,

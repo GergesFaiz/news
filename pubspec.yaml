@@ -45,6 +45,8 @@ dependencies:
   infinite_scroll_pagination: ^5.1.1
   flutter_localizations:
     sdk: flutter
+  dio: ^5.9.2
+  pretty_dio_logger: ^1.4.0
 
 dev_dependencies:
   flutter_test:
