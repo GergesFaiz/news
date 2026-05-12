@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:news/model/news_response.dart';
+import 'package:news/api/Retrofit/model/news/news.dart';
 import 'package:news/utils/screen_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 

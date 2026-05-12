@@ -1,11 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:news/api/api_manager.dart';
+import 'package:news/api/Retrofit/model/news/news.dart';
+import 'package:news/api/Retrofit/retrofit_service.dart';
+import 'package:news/api/api_constants.dart';
 import 'package:news/home/news/news_details_bottom_sheet.dart';
 import 'package:news/home/news/news_item.dart';
 import 'package:news/home/search/empty_search_widget.dart';
 import 'package:news/home/widget/main_error_widget.dart';
 import 'package:news/home/widget/main_loading_widget.dart';
-import 'package:news/model/news_response.dart';
 import 'package:news/utils/screen_utils.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
@@ -21,13 +23,23 @@ class _SearchScreenState extends State<SearchScreen> {
   String _querySearch = '';
   bool _hasSearched = false;
 
+  // FIX: كان PagingController<int, NewsResponse> — لازم يكون <int, News>
   late final PagingController<int, News> _pagingController =
-      PagingController<int, News>(
-        getNextPageKey: (state) =>
-            state.lastPageIsEmpty ? null : state.nextIntPageKey,
-        fetchPage: (pageKey) =>
-            ApiManager.searchNews(_querySearch, page: pageKey),
+  PagingController<int, News>(
+    getNextPageKey: (state) =>
+    state.lastPageIsEmpty ? null : state.nextIntPageKey,
+    fetchPage: (pageKey) async {
+      // FIX: searchNews بترجع NewsResponse — بنرجع articles (List<News>)
+      final response = await RetrofitService(Dio()).searchNews(
+        ApiConstants.apiKey,
+        _querySearch,
+        "publishedAt",
+        20,
+        pageKey,
       );
+      return response.articles ?? [];
+    },
+  );
 
   void _onSearch(String query) {
     final trimmed = query.trim();
@@ -72,19 +84,19 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   suffixIcon: _controller.text.isNotEmpty
                       ? IconButton(
-                          icon: Icon(
-                            Icons.clear,
-                            color: Theme.of(context).splashColor,
-                          ),
-                          onPressed: () {
-                            _controller.clear();
-                            setState(() {
-                              _querySearch = '';
-                              _hasSearched = false;
-                            });
-                            _pagingController.refresh();
-                          },
-                        )
+                    icon: Icon(
+                      Icons.clear,
+                      color: Theme.of(context).splashColor,
+                    ),
+                    onPressed: () {
+                      _controller.clear();
+                      setState(() {
+                        _querySearch = '';
+                        _hasSearched = false;
+                      });
+                      _pagingController.refresh();
+                    },
+                  )
                       : null,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -113,59 +125,54 @@ class _SearchScreenState extends State<SearchScreen> {
               // Results
               Expanded(
                 child: !_hasSearched
-                    ? EmptySearchWidget()
+                    ? const EmptySearchWidget()
                     : PagingListener(
-                        controller: _pagingController,
-                        builder: (context, state, fetchNextPage) =>
-                            PagedListView<int, News>(
-                              state: state,
-                              fetchNextPage: fetchNextPage,
-                              builderDelegate: PagedChildBuilderDelegate<News>(
-                                itemBuilder: (context, news, index) => Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom: height * 0.02,
-                                  ),
-                                  child: InkWell(
-                                    onTap: () => showModalBottomSheet(
-                                      context: context,
-                                      builder: (_) =>
-                                          NewsDetailsBottomSheet(news: news),
-                                    ),
-                                    child: NewsItem(news: news),
-                                  ),
-                                ),
-                                firstPageProgressIndicatorBuilder: (_) =>
-                                    const MainLoadingWidget(),
-                                newPageProgressIndicatorBuilder: (_) =>
-                                    const Center(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(16),
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    ),
-                                firstPageErrorIndicatorBuilder: (_) =>
-                                    MainErrorWidget(
-                                      massage: 'Something went wrong',
-                                      onPressed: _pagingController.refresh,
-                                    ),
-                                newPageErrorIndicatorBuilder: (_) => Center(
-                                  child: TextButton(
-                                    onPressed: fetchNextPage,
-
-                                    child: const Text('Retry'),
-                                  ),
-                                ),
-                                noItemsFoundIndicatorBuilder: (_) => Center(
-                                  child: Text(
-                                    'No results for "$_querySearch"',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.labelMedium,
-                                  ),
-                                ),
+                  controller: _pagingController,
+                  builder: (context, state, fetchNextPage) =>
+                      PagedListView<int, News>(
+                        state: state,
+                        fetchNextPage: fetchNextPage,
+                        builderDelegate: PagedChildBuilderDelegate<News>(
+                          itemBuilder: (context, news, index) => Padding(
+                            padding: EdgeInsets.only(bottom: height * 0.02),
+                            child: InkWell(
+                              onTap: () => showModalBottomSheet(
+                                context: context,
+                                builder: (_) =>
+                                    NewsDetailsBottomSheet(news: news),
                               ),
+                              child: NewsItem(news: news),
                             ),
+                          ),
+                          firstPageProgressIndicatorBuilder: (_) =>
+                          const MainLoadingWidget(),
+                          newPageProgressIndicatorBuilder: (_) =>
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          firstPageErrorIndicatorBuilder: (_) =>
+                              MainErrorWidget(
+                                massage: 'Something went wrong',
+                                onPressed: _pagingController.refresh,
+                              ),
+                          newPageErrorIndicatorBuilder: (_) => Center(
+                            child: TextButton(
+                              onPressed: fetchNextPage,
+                              child: const Text('Retry'),
+                            ),
+                          ),
+                          noItemsFoundIndicatorBuilder: (_) => Center(
+                            child: Text(
+                              'No results for "$_querySearch"',
+                              style: Theme.of(context).textTheme.labelMedium,
+                            ),
+                          ),
+                        ),
                       ),
+                ),
               ),
             ],
           ),

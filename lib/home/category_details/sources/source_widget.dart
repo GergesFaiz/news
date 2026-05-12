@@ -1,9 +1,8 @@
+
 import 'package:flutter/material.dart';
-import 'package:news/home/category_details/category_details.dart';
+import 'package:news/api/Retrofit/model/source/source.dart';
 import 'package:news/home/category_details/sources/source_name.dart';
 import 'package:news/home/news/news_widget.dart';
-import 'package:news/model/news_response.dart';
-import 'package:news/model/source_response.dart';
 import 'package:news/utils/app_colors.dart';
 import 'package:news/utils/screen_utils.dart';
 

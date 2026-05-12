@@ -1,61 +1,67 @@
 
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:news/api/api_manager.dart';
+import 'package:news/api/Retrofit/model/source/source.dart';
+import 'package:news/api/Retrofit/retrofit_service.dart';
+import 'package:news/api/api_constants.dart';
 import 'package:news/home/category_details/sources/source_widget.dart';
 import 'package:news/home/widget/main_error_widget.dart';
 import 'package:news/home/widget/main_loading_widget.dart';
 import 'package:news/model/Category.dart';
-import 'package:news/model/news_response.dart';
-import 'package:news/model/source_response.dart';
 
 class CategoryDetails extends StatefulWidget {
   final Category category;
-   CategoryDetails({super.key,required this.category});
+
+  CategoryDetails({super.key, required this.category});
 
   @override
   State<CategoryDetails> createState() => _CategoryDetailsState();
 }
 
 class _CategoryDetailsState extends State<CategoryDetails> {
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<SourceResponse>(
-      future: ApiManager.getSources(widget.category.id),
+    return FutureBuilder(
+      future: RetrofitService(Dio()).getSources(ApiConstants.apiKey,
+          widget.category.id),
       builder: (context, snapshot) {
         //todo:loading
         if (snapshot.connectionState == ConnectionState.waiting) {
           return MainLoadingWidget();
-        }
-        else if (snapshot.hasError) {
+        } else if (snapshot.hasError) {
           //todo: Error
           return MainErrorWidget(
             onPressed: () {
-              ApiManager.getSources(widget.category.id);
+              RetrofitService(Dio()).getSources(ApiConstants.apiKey,
+                  widget.category.id);
               setState(() {});
             },
             massage: 'Something went wrong',
           );
         }
         //todo: server => response=> success , error
-       else if (snapshot.data?.status != 'ok') {
-          //todo:response= Error
-          return MainErrorWidget(
-            onPressed: () {
-              ApiManager.getSources(widget.category.id);
-              setState(() {});
-            },
-            massage: snapshot.data!.message!,
-          );
-        }
+        // else if (snapshot.data?.status != 'ok') {
+        //    //todo:response= Error
+        //    return MainErrorWidget(
+        //      onPressed: () {
+        //        DioManager().getSources(widget.category.id);
+        //        setState(() {});
+        //      },
+        //      massage: snapshot.data!.message!,
+        //    );
+        //  }
 
         //todo:response= Success
-        List<Source> sourcesList = snapshot.data?.sources ?? [];
-        return sourcesList.isEmpty?
-        Center(child: Text('No Sources Found',style: Theme.of(context).textTheme.labelLarge,))
-            :
-          SourceWidget(sourcesList: sourcesList);
+        List<Source> sourcesList = snapshot.data?.sources??[];
+        return sourcesList.isEmpty
+            ? Center(
+                child: Text(
+                  'No Sources Found',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              )
+            : SourceWidget(sourcesList: sourcesList);
       },
     );
   }
