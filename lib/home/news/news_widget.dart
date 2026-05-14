@@ -1,12 +1,14 @@
+
+
 import 'package:flutter/material.dart';
-import 'package:news/api/api_manager.dart';
 import 'package:news/home/news/news_details_bottom_sheet.dart';
 import 'package:news/home/news/news_item.dart';
+import 'package:news/home/news/news_view_model.dart';
 import 'package:news/home/widget/main_error_widget.dart';
 import 'package:news/home/widget/main_loading_widget.dart';
-import 'package:news/model/news_response.dart';
 import 'package:news/model/source_response.dart';
 import 'package:news/utils/screen_utils.dart';
+import 'package:provider/provider.dart';
 
 class NewsWidget extends StatefulWidget {
   final Source source;
@@ -18,67 +20,71 @@ class NewsWidget extends StatefulWidget {
 }
 
 class _NewsWidgetState extends State<NewsWidget> {
-  @override
-  Widget build(BuildContext context) {
-    var width = context.width;
-    var height = context.height;
-    return FutureBuilder<NewResponse>(
-      future: ApiManager.getNewsBySourceId(widget.source.id ?? ''),
-      builder: (context, snapshot) {
-        //todo:loading
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return MainLoadingWidget();
-        } else if (snapshot.hasError) {
-          //todo: Error
-          return MainErrorWidget(
-            onPressed: () {
-              ApiManager.getNewsBySourceId(widget.source.id ?? '');
-              setState(() {});
-            },
-            massage: 'Something went wrong',
-          );
-        }
-        //todo: server => response=> success , error
-        else if (snapshot.data?.status != 'ok') {
-          //todo:response= Error
-          return MainErrorWidget(
-            onPressed: () {
-              ApiManager.getNewsBySourceId(widget.source.id ?? '');
-              setState(() {});
-            },
-            massage: snapshot.data!.message!,
-          );
-        }
+  NewsViewModel viewModel = NewsViewModel();
 
-        //todo:response= Success
-        var newsList = snapshot.data?.articles ?? [];
-        return newsList.isEmpty
-            ? Center(
-                child: Text(
-                  'No News Found',
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-              )
-            : ListView.separated(
-                separatorBuilder: (context, index) {
-                  return SizedBox(height: height * 0.02);
-                },
-                itemBuilder: (context, index) {
-                  return InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) =>
-                              NewsDetailsBottomSheet(news: newsList[index]),
-                        );
-                      },
-                      child: NewsItem(news: newsList[index]));
-                },
-                itemCount: newsList.length,
-              );
-      },
-    );
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    viewModel.getNewsBySourceId(widget.source.id ?? '');
+
+  }
+  @override
+  void didUpdateWidget(covariant NewsWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.source.id != widget.source.id) {
+      viewModel.getNewsBySourceId(widget.source.id ?? '');
+    }
   }
 
-
+  @override
+  Widget build(BuildContext context) {
+    var height = context.height;
+    return ChangeNotifierProvider(
+      create: (context) => viewModel,
+      child: Consumer<NewsViewModel>(
+        builder: (context, viewModel, child) {
+          if (viewModel.errorMessage != null) {
+            return MainErrorWidget(
+              onPressed: () {
+                viewModel.getNewsBySourceId(widget.source.id ?? '');
+              },
+              massage: viewModel.errorMessage!,
+            );
+          } //todo: erorr
+          else if (viewModel.newsList == null) {
+            return MainLoadingWidget();
+          } //todo: loading
+          else {
+            return viewModel.newsList!.isEmpty
+                ? Center(
+                    child: Text(
+                      'No News Found',
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                  )
+                : ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return SizedBox(height: height * 0.02);
+                    },
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) => NewsDetailsBottomSheet(
+                              news: viewModel.newsList![index],
+                            ),
+                          );
+                        },
+                        child: NewsItem(news: viewModel.newsList![index]),
+                      );
+                    },
+                    itemCount: viewModel.newsList!.length,
+                  );
+          } //todo: Success
+        },
+      ),
+    );
+  }
 }

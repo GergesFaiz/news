@@ -1,8 +1,8 @@
+
+
 import 'package:flutter/material.dart';
-import 'package:news/home/category_details/category_details.dart';
 import 'package:news/home/category_details/sources/source_name.dart';
 import 'package:news/home/news/news_widget.dart';
-import 'package:news/model/news_response.dart';
 import 'package:news/model/source_response.dart';
 import 'package:news/utils/app_colors.dart';
 import 'package:news/utils/screen_utils.dart';
@@ -22,7 +22,6 @@ class _SourceWidgetState extends State<SourceWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var width = context.width;
     var height = context.height;
     return DefaultTabController(
         length: widget.sourcesList.length,
@@ -30,9 +29,9 @@ class _SourceWidgetState extends State<SourceWidget> {
           children: [
             TabBar(
               onTap: (index) {
-                selectedIndex=index;
-                setState(() {
 
+                setState(() {
+                  selectedIndex=index;
                 });
               },
                 isScrollable: true,
