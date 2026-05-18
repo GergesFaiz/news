@@ -1,7 +1,9 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:news/api/api_manager.dart';
+import 'package:news/home/category_details/Cubit/source_state.dart';
+import 'package:news/home/category_details/Cubit/source_view_model.dart';
 import 'package:news/home/category_details/sources/source_widget.dart';
 import 'package:news/home/widget/main_error_widget.dart';
 import 'package:news/home/widget/main_loading_widget.dart';
@@ -11,52 +13,52 @@ import 'package:news/model/source_response.dart';
 
 class CategoryDetails extends StatefulWidget {
   final Category category;
-   CategoryDetails({super.key,required this.category});
+
+   CategoryDetails({super.key, required this.category});
 
   @override
   State<CategoryDetails> createState() => _CategoryDetailsState();
 }
 
 class _CategoryDetailsState extends State<CategoryDetails> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    viewModel.getSources(widget.category.id);
+  }
+
+  SourceViewModel viewModel = SourceViewModel();
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<SourceResponse>(
-      future: ApiManager.getSources(widget.category.id),
-      builder: (context, snapshot) {
-        //todo:loading
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return MainLoadingWidget();
-        }
-        else if (snapshot.hasError) {
-          //todo: Error
-          return MainErrorWidget(
-            onPressed: () {
-              ApiManager.getSources(widget.category.id);
-              setState(() {});
-            },
-            massage: 'Something went wrong',
-          );
-        }
-        //todo: server => response=> success , error
-       else if (snapshot.data?.status != 'ok') {
-          //todo:response= Error
-          return MainErrorWidget(
-            onPressed: () {
-              ApiManager.getSources(widget.category.id);
-              setState(() {});
-            },
-            massage: snapshot.data!.message!,
-          );
-        }
-
-        //todo:response= Success
-        List<Source> sourcesList = snapshot.data?.sources ?? [];
-        return sourcesList.isEmpty?
-        Center(child: Text('No Sources Found',style: Theme.of(context).textTheme.labelLarge,))
-            :
-          SourceWidget(sourcesList: sourcesList);
-      },
+    return BlocProvider<SourceViewModel>(
+      create: (context) => viewModel,
+      child: BlocBuilder<SourceViewModel, SourceState>(
+        builder: (context, state) {
+          if (state is SourceSuccessState) {
+            return state.sourcesList.isEmpty
+                ? Center(
+                    child: Text(
+                      'No Sources Found',
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                  )
+                : SourceWidget(sourcesList: state.sourcesList);
+          }
+          else if (state is SourceErrorState) {
+            return MainErrorWidget(
+              massage: state.errorMessage,
+              onPressed: () {
+                viewModel.getSources(widget.category.id);
+              },
+            );
+          }
+          else {
+            return MainLoadingWidget();
+          }
+        },
+      ),
     );
   }
 }

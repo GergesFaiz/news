@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news/home/homeScreen.dart';
 import 'package:news/l10n/app_localizations.dart';
 import 'package:news/providers/language_provider.dart';
 import 'package:news/providers/theme_provider.dart';
 import 'package:news/utils/appRoutes.dart';
 import 'package:news/utils/app_theme.dart';
+import 'package:news/utils/my_bloc_observer.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  Bloc.observer = MyBlocObserver();
   runApp(
     MultiProvider(
       providers: [

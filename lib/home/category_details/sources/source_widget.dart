@@ -10,46 +10,45 @@ import 'package:news/utils/screen_utils.dart';
 class SourceWidget extends StatefulWidget {
   final List<Source> sourcesList;
 
-   SourceWidget({super.key,required this.sourcesList});
+  SourceWidget({super.key, required this.sourcesList});
 
   @override
   State<SourceWidget> createState() => _SourceWidgetState();
 }
 
 class _SourceWidgetState extends State<SourceWidget> {
-
-  int selectedIndex =0;
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     var width = context.width;
     var height = context.height;
     return DefaultTabController(
-        length: widget.sourcesList.length,
-        child: Column(spacing: height*0.02,
-          children: [
-            TabBar(
-              onTap: (index) {
-                selectedIndex=index;
-                setState(() {
-
-                });
-              },
-                isScrollable: true,
-                tabAlignment: TabAlignment.start,
-                indicatorColor: Theme.of(context).splashColor,
-                dividerColor: AppColors.transparentColor,
-                tabs: widget.sourcesList.map(
-                  (source) {
-                    return SourceName(
-                        source: source,
-                        isSelected: selectedIndex==widget.sourcesList.indexOf(source));
-                  },
-                ).toList()
-            ),
-            Expanded(child: NewsWidget(source:widget.sourcesList[selectedIndex],))
-
-          ],
-        ));
+      length: widget.sourcesList.length,
+      child: Column(
+        spacing: height * 0.02,
+        children: [
+          TabBar(
+            onTap: (index) {
+              selectedIndex = index;
+              setState(() {});
+            },
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            indicatorColor: Theme.of(context).splashColor,
+            dividerColor: AppColors.transparentColor,
+            tabs: widget.sourcesList.map((source) {
+              return SourceName(
+                source: source,
+                isSelected: selectedIndex == widget.sourcesList.indexOf(source),
+              );
+            }).toList(),
+          ),
+          Expanded(
+            child: NewsWidget(source: widget.sourcesList[selectedIndex]),
+          ),
+        ],
+      ),
+    );
   }
 }
