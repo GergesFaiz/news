@@ -4,7 +4,6 @@ import 'package:news/home/news/news_details_bottom_sheet.dart';
 import 'package:news/home/news/news_item.dart';
 import 'package:news/home/widget/main_error_widget.dart';
 import 'package:news/home/widget/main_loading_widget.dart';
-import 'package:news/model/news_response.dart';
 import 'package:news/model/source_response.dart';
 import 'package:news/utils/screen_utils.dart';
 
@@ -22,8 +21,8 @@ class _NewsWidgetState extends State<NewsWidget> {
   Widget build(BuildContext context) {
     var width = context.width;
     var height = context.height;
-    return FutureBuilder<NewResponse>(
-      future: ApiManager.getNewsBySourceId(widget.source.id ?? ''),
+    return FutureBuilder(
+      future: ApiManager.getNewsBySourceId(widget.source.id??''),
       builder: (context, snapshot) {
         //todo:loading
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -32,23 +31,23 @@ class _NewsWidgetState extends State<NewsWidget> {
           //todo: Error
           return MainErrorWidget(
             onPressed: () {
-              ApiManager.getNewsBySourceId(widget.source.id ?? '');
+              ApiManager.getNewsBySourceId(widget.source.id??'');
               setState(() {});
             },
             massage: 'Something went wrong',
           );
         }
         //todo: server => response=> success , error
-        else if (snapshot.data?.status != 'ok') {
-          //todo:response= Error
-          return MainErrorWidget(
-            onPressed: () {
-              ApiManager.getNewsBySourceId(widget.source.id ?? '');
-              setState(() {});
-            },
-            massage: snapshot.data!.message!,
-          );
-        }
+        // else if (snapshot.data?.status != 'ok') {
+        //   //todo:response= Error
+        //   return MainErrorWidget(
+        //     onPressed: () {
+        //       DioManager().getNewsBySourceId(widget.source.id ?? '');
+        //       setState(() {});
+        //     },
+        //     massage: snapshot.data!.message!,
+        //   );
+        // }
 
         //todo:response= Success
         var newsList = snapshot.data?.articles ?? [];
@@ -65,20 +64,19 @@ class _NewsWidgetState extends State<NewsWidget> {
                 },
                 itemBuilder: (context, index) {
                   return InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) =>
-                              NewsDetailsBottomSheet(news: newsList[index]),
-                        );
-                      },
-                      child: NewsItem(news: newsList[index]));
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) =>
+                            NewsDetailsBottomSheet(news: newsList[index]),
+                      );
+                    },
+                    child: NewsItem(news: newsList[index]),
+                  );
                 },
                 itemCount: newsList.length,
               );
       },
     );
   }
-
-
 }
