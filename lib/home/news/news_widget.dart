@@ -28,6 +28,13 @@ class _NewsWidgetState extends State<NewsWidget> {
     super.initState();
     viewModel.getNewsBySourceId(widget.source.id ?? '');
   }
+  @override
+  void didUpdateWidget(covariant NewsWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.source.id != widget.source.id) {
+      viewModel.getNewsBySourceId(widget.source.id ?? '');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
