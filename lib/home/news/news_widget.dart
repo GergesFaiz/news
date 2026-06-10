@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:news/di/di.dart';
 import 'package:news/home/news/news_details_bottom_sheet.dart';
 import 'package:news/home/news/news_item.dart';
 import 'package:news/home/news/news_view_model.dart';
@@ -20,7 +21,8 @@ class NewsWidget extends StatefulWidget {
 }
 
 class _NewsWidgetState extends State<NewsWidget> {
-  NewsViewModel viewModel = NewsViewModel();
+  NewsViewModel viewModel = NewsViewModel(
+      newsRepository: injectNewsRepository());
 
   @override
   void initState() {

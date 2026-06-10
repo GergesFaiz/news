@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:news/api/api_manager.dart';
+import 'package:news/di/di.dart';
 import 'package:news/home/category_details/source_view_model.dart';
 import 'package:news/home/category_details/sources/source_widget.dart';
 import 'package:news/home/widget/main_error_widget.dart';
@@ -21,7 +22,8 @@ class CategoryDetails extends StatefulWidget {
 }
 
 class _CategoryDetailsState extends State<CategoryDetails> {
-  SourceViewModel viewModel = SourceViewModel();
+  SourceViewModel viewModel = SourceViewModel(
+      sourceRepository: injectSourceRepository());
   @override
   void initState() {
     // TODO: implement initState
